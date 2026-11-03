@@ -24,7 +24,7 @@
   :root{ --bg:#1d1712; --surface:#2a211a; --surface-alt:#3a2d22; --text:#f5ece3; --dim:#b8a695; --border:#453628; --accent:#f0836a; --accent-soft:#452a22; --mustard:#e9b95c; --mustard-soft:#453818; --teal:#5fbdb4; --teal-soft:#1e3a37; }
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none;scroll-padding-bottom:calc(104px + env(safe-area-inset-bottom, 0px))}
 #ptr{position:fixed;top:calc(env(safe-area-inset-top, 0px) + 10px);left:50%;z-index:60;transform:translate(-50%,-72px);display:flex;align-items:center;gap:6px;background:var(--surface);color:var(--dim);border:1px solid var(--border);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:600;line-height:1;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.10);opacity:0;pointer-events:none;will-change:transform,opacity}
 #ptr.ready{color:var(--accent);border-color:var(--accent)}
 #ptr .ptr-arrow{display:inline-block;transition:transform .15s ease}
@@ -38,9 +38,11 @@ header.bar-hidden{transform:translateY(-100%)}
 .head-top{display:flex;align-items:center;gap:10px;padding:10px 0}
 h1{font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;font-size:19px;margin:0;line-height:1.3;white-space:nowrap}
 .counts{font-size:12px;color:var(--dim);white-space:nowrap;margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.head-toggle{appearance:none;margin-left:auto;flex:none;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
-.head-toggle:active{opacity:.8}
 #headPanel{padding-bottom:4px}
+.head-handle{position:fixed;top:calc(env(safe-area-inset-top, 0px) + 6px);left:50%;transform:translate(-50%,-8px);z-index:30;appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--dim);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.12);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;white-space:nowrap}
+.head-handle.handle-show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.head-handle:active{opacity:.85}
+@media (prefers-reduced-motion: reduce){.head-handle{transition:none}}
 .card-img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:10px;margin:0 0 12px;background:var(--surface-alt)}
 .rankfab{position:fixed;left:0;right:0;bottom:0;z-index:40;border:0;border-radius:0;background:var(--accent);color:#fff;font-family:inherit;font-size:16px;font-weight:800;padding:15px 26px calc(15px + env(safe-area-inset-bottom));cursor:pointer;box-shadow:0 -4px 18px rgba(0,0,0,.22);white-space:nowrap;text-align:center;width:100%;transition:transform .32s ease;will-change:transform}
 .rankfab.fab-hidden{transform:translateY(110%);pointer-events:none}
@@ -135,9 +137,8 @@ footer{padding:0 0 calc(104px + env(safe-area-inset-bottom));font-size:11px;colo
     <div class="head-top">
       <h1>🐾 商品候補リスト</h1>
       <p class="counts" id="counts"></p>
-      <button type="button" class="head-toggle" id="headToggle" aria-expanded="false" aria-controls="headPanel">検索・絞り込み ▾</button>
     </div>
-    <div id="headPanel" hidden>
+    <div id="headPanel">
     <p class="sub">itoshi pet「うちの子の記念日を、わくわくに」— 選定基準（感情・利益・仕入れ安定性）で見比べる候補一覧です。食品・飲料は対象外にしています。</p>
     <p class="addhint">📱 ホーム画面に追加：Safariでこのページを開き、共有ボタン →「ホーム画面に追加」を選ぶとアプリのように開けます。印（★検討中／除外）はこの端末に保存されます。</p>
     <div class="filters">
@@ -154,6 +155,7 @@ footer{padding:0 0 calc(104px + env(safe-area-inset-bottom));font-size:11px;colo
     </div>
   </div>
 </header>
+<button type="button" class="head-handle" id="headHandle" aria-hidden="true" tabindex="-1">⌄ 検索条件を表示</button>
 <main class="wrap">
   <ul class="grid" id="list"></ul>
   <p class="empty" id="empty" hidden>絞り込みに合う候補がありません。条件を変えてみてください。</p>
@@ -389,19 +391,32 @@ rankPanel.addEventListener("click", function(e){
 });
 document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeRank(); });
 
-/* 上部エリアの折りたたみ（タップしたときだけ展開。スクロールでは広がらない） */
-var headToggle = document.getElementById("headToggle");
-var headPanel = document.getElementById("headPanel");
+/* 上部ブロック（タイトル・件数・検索・フィルタ）は常に全部表示。
+   下スクロールで全体が上にスライドして隠れる。再表示の条件は2つだけ：
+   (1) 一番上までスクロールしきった時 (2) 上端に残る小さなタブ「⌄ 検索条件を表示」をタップした時。
+   途中で上スクロールしただけでは出てこない。
+   検索入力にフォーカスしている間と、ランキングパネルを開いている間は隠さない */
 var siteHeader = document.querySelector("header");
-headToggle.addEventListener("click", function(){
-  var open = headPanel.hidden;
-  headPanel.hidden = !open;
-  headToggle.setAttribute("aria-expanded", String(open));
-  headToggle.textContent = open ? "閉じる ▴" : "検索・絞り込み ▾";
-  if(open && siteHeader){ siteHeader.classList.remove("bar-hidden"); }
-});
+var searchInput = document.getElementById("q");
+var headHandle = document.getElementById("headHandle");
+function setHeaderHidden(hidden){
+  if(!siteHeader) return;
+  siteHeader.classList.toggle("bar-hidden", hidden);
+  if(headHandle){
+    headHandle.classList.toggle("handle-show", hidden);
+    headHandle.setAttribute("aria-hidden", String(!hidden));
+    headHandle.tabIndex = hidden ? 0 : -1;
+  }
+}
+if(headHandle){
+  headHandle.addEventListener("click", function(){ setHeaderHidden(false); });
+}
+if(searchInput){
+  searchInput.addEventListener("focus", function(){ setHeaderHidden(false); });
+}
 
-/* 上部バー＆下部ランキングボタン：下スクロールで隠れ、上スクロールで戻る（パネル開時は隠れない） */
+/* 上部ブロック＆下部ランキングボタン：下スクロールで隠れる。
+   下部バーは上スクロール／スクロール停止で戻るが、上部ブロックは最上部かタブのタップでのみ戻る */
 /* 下部ボタンは画面下端に固定。下スクロール中は下へスライドして隠れ、上スクロール／スクロール停止で下端に再表示 */
 (function(){
   if(!siteHeader) return;
@@ -411,18 +426,28 @@ headToggle.addEventListener("click", function(){
   var lastY = window.scrollY || 0;
   var ticking = false;
   var stopTimer = null;
+  function searchFocused(){
+    return !!(searchInput && document.activeElement === searchInput);
+  }
   function update(){
     ticking = false;
     var y = window.scrollY || 0;
-    /* 検索・絞り込みパネル／ランキングパネルを開いている間は隠さない */
-    if((headPanel && !headPanel.hidden) || (typeof rankPanel !== "undefined" && rankPanel && !rankPanel.hidden)){
-      siteHeader.classList.remove("bar-hidden");
+    /* 検索入力中は上部ブロックを隠さない */
+    if(searchFocused()){
+      setHeaderHidden(false);
+      lastY = y;
+      return;
+    }
+    /* ランキングパネルを開いている間は隠さない */
+    if(typeof rankPanel !== "undefined" && rankPanel && !rankPanel.hidden){
+      setHeaderHidden(false);
       showFab();
       lastY = y;
       return;
     }
+    /* 一番上まで戻ったら上部ブロックを自動で再表示する */
     if(y <= 10){
-      siteHeader.classList.remove("bar-hidden");
+      setHeaderHidden(false);
       showFab();
       lastY = y;
       return;
@@ -430,10 +455,11 @@ headToggle.addEventListener("click", function(){
     var dy = y - lastY;
     if(Math.abs(dy) < 5) return;
     if(dy > 0 && y > 90){
-      siteHeader.classList.add("bar-hidden");
+      /* 下スクロール：上部ブロック全体を上へしまい、下部バーも隠す */
+      setHeaderHidden(true);
       hideFab();
     } else if(dy < 0){
-      siteHeader.classList.remove("bar-hidden");
+      /* 上スクロール：下部バーだけ戻す（上部ブロックは出さない） */
       showFab();
     }
     lastY = y;
