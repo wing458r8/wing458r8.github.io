@@ -31,7 +31,9 @@ html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
 #ptr.ready .ptr-arrow{transform:rotate(180deg)}
 body{margin:0;background:var(--bg);color:var(--text);font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI",system-ui,-apple-system,sans-serif;line-height:1.55}
 a{color:var(--teal)}
-header{position:sticky;top:0;z-index:20;background:color-mix(in srgb, var(--bg) 96%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top)}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb, var(--bg) 96%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top);transition:transform .32s ease;will-change:transform}
+header.bar-hidden{transform:translateY(-100%)}
+@media (prefers-reduced-motion: reduce){header{transition:none}}
 .wrap{max-width:1024px;margin:0 auto;padding:0 16px}
 .head-top{display:flex;align-items:center;gap:10px;padding:10px 0}
 h1{font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;font-size:19px;margin:0;line-height:1.3;white-space:nowrap}
@@ -40,8 +42,10 @@ h1{font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;font-size:
 .head-toggle:active{opacity:.8}
 #headPanel{padding-bottom:4px}
 .card-img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:10px;margin:0 0 12px;background:var(--surface-alt)}
-.rankfab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:40;border:0;border-radius:999px;background:var(--accent);color:#fff;font-family:inherit;font-size:16px;font-weight:800;padding:15px 26px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.28);white-space:nowrap}
+.rankfab{position:fixed;left:0;right:0;bottom:0;z-index:40;border:0;border-radius:0;background:var(--accent);color:#fff;font-family:inherit;font-size:16px;font-weight:800;padding:15px 26px calc(15px + env(safe-area-inset-bottom));cursor:pointer;box-shadow:0 -4px 18px rgba(0,0,0,.22);white-space:nowrap;text-align:center;width:100%;transition:transform .32s ease;will-change:transform}
+.rankfab.fab-hidden{transform:translateY(110%);pointer-events:none}
 .rankfab:active{opacity:.88}
+@media (prefers-reduced-motion: reduce){.rankfab{transition:none}}
 .rankoverlay{position:fixed;inset:0;z-index:50}
 .rankoverlay[hidden]{display:none}
 .rankbackdrop{position:absolute;inset:0;background:rgba(0,0,0,.45)}
@@ -388,12 +392,62 @@ document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeRa
 /* 上部エリアの折りたたみ（タップしたときだけ展開。スクロールでは広がらない） */
 var headToggle = document.getElementById("headToggle");
 var headPanel = document.getElementById("headPanel");
+var siteHeader = document.querySelector("header");
 headToggle.addEventListener("click", function(){
   var open = headPanel.hidden;
   headPanel.hidden = !open;
   headToggle.setAttribute("aria-expanded", String(open));
   headToggle.textContent = open ? "閉じる ▴" : "検索・絞り込み ▾";
+  if(open && siteHeader){ siteHeader.classList.remove("bar-hidden"); }
 });
+
+/* 上部バー＆下部ランキングボタン：下スクロールで隠れ、上スクロールで戻る（パネル開時は隠れない） */
+/* 下部ボタンは画面下端に固定。下スクロール中は下へスライドして隠れ、上スクロール／スクロール停止で下端に再表示 */
+(function(){
+  if(!siteHeader) return;
+  var rankFabEl = document.getElementById("rankFab");
+  function showFab(){ if(rankFabEl) rankFabEl.classList.remove("fab-hidden"); }
+  function hideFab(){ if(rankFabEl) rankFabEl.classList.add("fab-hidden"); }
+  var lastY = window.scrollY || 0;
+  var ticking = false;
+  var stopTimer = null;
+  function update(){
+    ticking = false;
+    var y = window.scrollY || 0;
+    /* 検索・絞り込みパネル／ランキングパネルを開いている間は隠さない */
+    if((headPanel && !headPanel.hidden) || (typeof rankPanel !== "undefined" && rankPanel && !rankPanel.hidden)){
+      siteHeader.classList.remove("bar-hidden");
+      showFab();
+      lastY = y;
+      return;
+    }
+    if(y <= 10){
+      siteHeader.classList.remove("bar-hidden");
+      showFab();
+      lastY = y;
+      return;
+    }
+    var dy = y - lastY;
+    if(Math.abs(dy) < 5) return;
+    if(dy > 0 && y > 90){
+      siteHeader.classList.add("bar-hidden");
+      hideFab();
+    } else if(dy < 0){
+      siteHeader.classList.remove("bar-hidden");
+      showFab();
+    }
+    lastY = y;
+  }
+  window.addEventListener("scroll", function(){
+    if(!ticking){ ticking = true; requestAnimationFrame(update); }
+    /* スクロールが止まったら下部ボタンを下端に再表示する */
+    if(stopTimer) clearTimeout(stopTimer);
+    stopTimer = setTimeout(function(){
+      if(typeof rankPanel !== "undefined" && rankPanel && !rankPanel.hidden) return;
+      showFab();
+    }, 900);
+  }, {passive:true});
+})();
 
 /* Pull to refresh (standalone / home-screen app support) */
 (function(){
