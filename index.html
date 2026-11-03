@@ -24,7 +24,11 @@
   :root{ --bg:#1d1712; --surface:#2a211a; --surface-alt:#3a2d22; --text:#f5ece3; --dim:#b8a695; --border:#453628; --accent:#f0836a; --accent-soft:#452a22; --mustard:#e9b95c; --mustard-soft:#453818; --teal:#5fbdb4; --teal-soft:#1e3a37; }
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+#ptr{position:fixed;top:calc(env(safe-area-inset-top, 0px) + 10px);left:50%;z-index:60;transform:translate(-50%,-72px);display:flex;align-items:center;gap:6px;background:var(--surface);color:var(--dim);border:1px solid var(--border);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:600;line-height:1;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.10);opacity:0;pointer-events:none;will-change:transform,opacity}
+#ptr.ready{color:var(--accent);border-color:var(--accent)}
+#ptr .ptr-arrow{display:inline-block;transition:transform .15s ease}
+#ptr.ready .ptr-arrow{transform:rotate(180deg)}
 body{margin:0;background:var(--bg);color:var(--text);font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI",system-ui,-apple-system,sans-serif;line-height:1.55}
 a{color:var(--teal)}
 header{position:sticky;top:0;z-index:20;background:color-mix(in srgb, var(--bg) 96%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top)}
@@ -108,6 +112,7 @@ footer{padding:0 0 calc(24px + env(safe-area-inset-bottom));font-size:11px;color
 </style>
 </head>
 <body>
+<div id="ptr" aria-hidden="true"><span class="ptr-arrow" id="ptrArrow">↓</span><span id="ptrText">引っ張って更新</span></div>
 <header>
   <div class="wrap">
     <div class="head-top">
@@ -326,6 +331,84 @@ document.addEventListener("click", function(e){
 });
 document.getElementById("q").addEventListener("input", function(e){ state.q = e.target.value; render(); });
 render();
+
+/* Pull to refresh (standalone / home-screen app support) */
+(function(){
+  var THRESHOLD = 70;
+  var el = document.getElementById("ptr");
+  var txt = document.getElementById("ptrText");
+  if(!el || !txt) return;
+  var startY = null, startX = null, pull = 0, pulling = false, cancelled = false;
+
+  function isInteractive(t){
+    return !!(t && t.closest && t.closest("input, textarea, select, button, a"));
+  }
+  function show(){
+    var damped = Math.min(pull * 0.55, 88);
+    var ready = pull >= THRESHOLD;
+    el.style.transition = "none";
+    el.style.transform = "translate(-50%," + (-72 + damped) + "px)";
+    el.style.opacity = pull > 4 ? String(Math.min(1, pull / 40)) : "0";
+    el.classList.toggle("ready", ready);
+    txt.textContent = ready ? "離して更新" : "引っ張って更新";
+  }
+  function hide(animate){
+    el.style.transition = animate ? "transform .25s ease, opacity .25s ease" : "none";
+    el.style.transform = "translate(-50%,-72px)";
+    el.style.opacity = "0";
+    el.classList.remove("ready");
+    txt.textContent = "引っ張って更新";
+  }
+  function reset(){
+    startY = null; startX = null; pull = 0; pulling = false; cancelled = false;
+  }
+
+  document.addEventListener("touchstart", function(e){
+    if(e.touches.length !== 1){ reset(); return; }
+    if(window.scrollY > 0){ reset(); return; }
+    if(isInteractive(e.target)){ reset(); return; }
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+    pull = 0; pulling = false; cancelled = false;
+  }, {passive:true});
+
+  document.addEventListener("touchmove", function(e){
+    if(startY === null || cancelled) return;
+    if(window.scrollY > 0){ hide(false); reset(); return; }
+    if(e.touches.length !== 1) return;
+    var dy = e.touches[0].clientY - startY;
+    var dx = e.touches[0].clientX - startX;
+    /* Upward drag: not a pull */
+    if(dy <= 0){ pull = 0; if(pulling){ pulling = false; hide(false); } return; }
+    /* Horizontal-dominant drag: ignore */
+    if(Math.abs(dx) > Math.abs(dy) * 0.9 && Math.abs(dx) > 8){ cancelled = true; hide(true); pull = 0; pulling = false; return; }
+    pulling = true;
+    pull = dy;
+    show();
+    /* Prevent native scroll / bounce only while actively pulling down at the very top */
+    if(dy > 8 && e.cancelable) e.preventDefault();
+  }, {passive:false});
+
+  function onEnd(){
+    if(startY === null) return;
+    var shouldReload = pulling && pull >= THRESHOLD;
+    var wasPulling = pulling;
+    if(shouldReload){
+      el.style.transition = "transform .15s ease, opacity .15s ease";
+      el.style.transform = "translate(-50%,6px)";
+      el.style.opacity = "1";
+      el.classList.add("ready");
+      txt.textContent = "更新中…";
+      reset();
+      setTimeout(function(){ location.reload(); }, 120);
+    } else {
+      if(wasPulling) hide(true); else hide(false);
+      reset();
+    }
+  }
+  document.addEventListener("touchend", onEnd, {passive:true});
+  document.addEventListener("touchcancel", function(){ hide(true); reset(); }, {passive:true});
+})();
 </script>
 </body>
 </html>
