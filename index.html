@@ -78,7 +78,7 @@ body.rank-open{overflow:hidden}
 main{padding:8px 0 40px}
 .grid{display:grid;grid-template-columns:1fr;gap:12px;list-style:none;margin:0;padding:0}
 @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
-.card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px 16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .card.excluded{opacity:.55}
 .card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
 .badges{display:flex;flex-wrap:wrap;gap:5px}
@@ -90,14 +90,14 @@ main{padding:8px 0 40px}
 .badge-s-lo{background:var(--accent-soft);color:var(--accent)}
 .badge-s-mid{background:var(--mustard-soft);color:var(--mustard)}
 .price{font-size:13px;font-weight:700;white-space:nowrap;text-align:right}
-.card h2{font-size:16px;line-height:1.45;margin:10px 0 0}
-.emotion{margin:6px 0 0;font-size:14px}
-.evidence{margin:4px 0 0;font-size:13px;color:var(--dim);line-height:1.6}
-.arrange{margin:10px 0 0;background:var(--accent-soft);border-radius:10px;padding:8px 12px;font-size:13px;line-height:1.6}
+.card h2{font-size:16px;line-height:1.45;margin:6px 0 0}
+.emotion{margin:4px 0 0;font-size:14px}
+.evidence{margin:2px 0 0;font-size:13px;color:var(--dim);line-height:1.6}
+.arrange{margin:6px 0 0;background:var(--accent-soft);border-radius:10px;padding:6px 12px;font-size:13px;line-height:1.6}
 .arrange b{font-weight:700}
-.src{margin:10px 0 0;font-size:11px;color:var(--dim);word-break:break-all}
+.src{margin:6px 0 0;font-size:11px;color:var(--dim);word-break:break-all}
 .src a{word-break:break-all}
-.tiktok-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;background:#111;color:#fff;text-decoration:none;border-radius:999px;padding:10px 14px;font-size:14px;font-weight:700}
+.tiktok-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;background:#111;color:#fff;text-decoration:none;border-radius:999px;padding:10px 14px;font-size:14px;font-weight:700}
 @media (prefers-color-scheme: dark){.tiktok-btn{background:#fff;color:#111}}
 .statusrow{display:flex;gap:6px;border-top:1px solid var(--border);margin-top:12px;padding-top:12px}
 .statusrow button{flex:1;border:0;border-radius:999px;padding:7px 4px;font-size:12px;font-weight:700;cursor:pointer;background:var(--surface-alt);color:var(--dim);font-family:inherit}
@@ -106,7 +106,7 @@ main{padding:8px 0 40px}
 .statusrow button.on-excluded{background:var(--dim);color:#fff}
 .empty{padding:48px 0;text-align:center;font-size:14px;color:var(--dim)}
 
-.scorebox{margin-top:10px;background:var(--surface-alt);border-radius:10px;padding:10px 12px}
+.scorebox{margin-top:6px;background:var(--surface-alt);border-radius:10px;padding:8px 12px}
 .scorebox .sc-top{display:flex;align-items:baseline;gap:8px}
 .scorebox .sc-total{font-size:20px;font-weight:800}
 .scorebox .sc-unit{font-size:12px;color:var(--dim)}
@@ -166,7 +166,7 @@ footer{padding:0 0 calc(104px + env(safe-area-inset-bottom));font-size:11px;colo
   <ul class="grid" id="list"></ul>
   <p class="empty" id="empty" hidden>絞り込みに合う候補がありません。条件を変えてみてください。</p>
 </main>
-<footer class="wrap">全38件 ・ 軸A 記念日・パーソナライズ 16件 / 軸B 個性的・わくわく 22件</footer>
+<footer class="wrap">全46件 ・ 軸A 記念日・パーソナライズ 18件 / 軸B 個性的・わくわく 28件</footer>
 <button type="button" class="rankfab" id="rankFab" aria-haspopup="dialog" aria-controls="rankPanel">🏆 売れそうランキング</button>
 <button type="button" class="refreshfab" id="refreshBtn" aria-label="更新" title="更新"><span class="refresh-icon" aria-hidden="true">↻</span></button>
 <div class="rankoverlay" id="rankPanel" hidden role="dialog" aria-modal="true" aria-label="売れそうランキング">
@@ -220,7 +220,15 @@ var CANDIDATES = [
 {id:73,name:"電動猫おもちゃ（四隅配置の回転ディスク、リモコン付き）",axis:"B",target:"cat",priceBand:"",emotion:"すごい/便利",sourcing:"中",evidence:"TikTok @mugipules の投稿で確認。四隅に配置する回転ディスク式の電動猫おもちゃ（リモコン付き）",sourceLabel:"TikTok @mugipules",sourceUrl:"https://www.tiktok.com/@mugipules/video/7692312721563372807",tiktokUrl:"https://www.tiktok.com/@mugipules/video/7692312721563372807",arrangement:"四隅から出入りする動きとリモコン操作で、猫の狩猟本能を刺激する遊びとして訴求",score:13,sEmo:4,sProfit:3,sSource:3,sBuzz:3,scoreNote:"四隅配置の回転ディスクという仕掛けの新しさ。リモコン付きで飼い主も一緒に楽しめる"},
 {id:74,name:"ペット用肉球ソックス（滑り止め・防水）",axis:"B",target:"dog",priceBand:"",emotion:"便利/かわいい",sourcing:"中",evidence:"TikTok @ms_jp_gf の投稿で確認。滑り止め・防水仕様のペット用肉球ソックス",sourceLabel:"TikTok @ms_jp_gf",sourceUrl:"https://www.tiktok.com/@ms_jp_gf/video/7642236931610397972",tiktokUrl:"https://www.tiktok.com/@ms_jp_gf/video/7642236931610397972",arrangement:"フローリングの滑り対策や雨の日の散歩後の汚れ対策として訴求",score:10,sEmo:3,sProfit:3,sSource:3,sBuzz:1,scoreNote:"滑り止め・防水の実用品。サイズ選びの難しさもあり控えめなスコア"},
 {id:75,name:"おしっこされても丸洗いできる神ラグ",axis:"B",target:"both",priceBand:"",emotion:"便利/すごい",sourcing:"高",evidence:"TikTok @kojipon86 の投稿で確認。おしっこされても丸洗いできるラグ",sourceLabel:"TikTok @kojipon86",sourceUrl:"https://www.tiktok.com/@kojipon86/video/7700185160045612308",tiktokUrl:"https://www.tiktok.com/@kojipon86/video/7700185160045612308",arrangement:"粗相しても丸洗いできる安心感で、トイレトレーニング中やシニア期のケアに訴求",score:14,sEmo:4,sProfit:3,sSource:4,sBuzz:3,scoreNote:"丸洗いできるラグで粗相の悩みに直結、仕入れ4。犬・猫どちらにも訴求できる"},
-{id:76,name:"引っ張り防止ハーネス（横のバックルで装着、持ち手付き）",axis:"B",target:"dog",priceBand:"",emotion:"便利/すごい",sourcing:"中",evidence:"TikTok @66xp44 の投稿で確認。横のバックルで装着できる引っ張り防止ハーネス（持ち手付き）",sourceLabel:"TikTok @66xp44",sourceUrl:"https://www.tiktok.com/@66xp44/video/7674900760412294418",tiktokUrl:"https://www.tiktok.com/@66xp44/video/7674900760412294418",arrangement:"引っ張り癖のしつけや、とっさに掴める持ち手の安心感を散歩グッズとして訴求",score:13,sEmo:4,sProfit:3,sSource:3,sBuzz:3,scoreNote:"引っ張り防止と持ち手付きの安心設計。散歩の悩みに直結する実用品"}
+{id:76,name:"引っ張り防止ハーネス（横のバックルで装着、持ち手付き）",axis:"B",target:"dog",priceBand:"",emotion:"便利/すごい",sourcing:"中",evidence:"TikTok @66xp44 の投稿で確認。横のバックルで装着できる引っ張り防止ハーネス（持ち手付き）",sourceLabel:"TikTok @66xp44",sourceUrl:"https://www.tiktok.com/@66xp44/video/7674900760412294418",tiktokUrl:"https://www.tiktok.com/@66xp44/video/7674900760412294418",arrangement:"引っ張り癖のしつけや、とっさに掴める持ち手の安心感を散歩グッズとして訴求",score:13,sEmo:4,sProfit:3,sSource:3,sBuzz:3,scoreNote:"引っ張り防止と持ち手付きの安心設計。散歩の悩みに直結する実用品"},
+{id:77,name:"折りたたみ猫用メッシュサークル（折りたたみ式プレイペン）",axis:"B",target:"cat",priceBand:"",emotion:"便利/かわいい",sourcing:"高",evidence:"TikTok Tansliya（@rachellerae15）の投稿で確認（いいね約5,024・保存約1,005）。折りたたみ式のメッシュサークル（プレイペン）で、設置と収納が簡単",sourceLabel:"TikTok @rachellerae15",sourceUrl:"https://www.tiktok.com/@rachellerae15/video/7698281918739025173",tiktokUrl:"https://www.tiktok.com/@rachellerae15/video/7698281918739025173",arrangement:"折りたたんで持ち運べるプレイペンとして、外出先や来客時の猫の居場所づくりに訴求",score:14,sEmo:4,sProfit:3,sSource:4,sBuzz:3,scoreNote:"折りたたみ式で設置・収納が簡単な実用品で仕入れ4。TikTokいいね約5,024・保存約1,005でバズ3"},
+{id:78,name:"Pawzen 不安軽減スローフィーディング・リックボウル",axis:"B",target:"dog",priceBand:"",emotion:"便利/他にない",sourcing:"高",evidence:"TikTok Pawzen（@paawzen）の投稿で確認（いいね約42.2K・保存約16.9K）。舐めることで不安を和らげるスローフィーディング・リックボウル",sourceLabel:"TikTok @paawzen",sourceUrl:"https://www.tiktok.com/@paawzen/video/7584623626377268510",tiktokUrl:"https://www.tiktok.com/@paawzen/video/7584623626377268510",arrangement:"お留守番や来客、花火など不安になりやすい場面での落ち着きケアとして訴求",score:16,sEmo:4,sProfit:4,sSource:4,sBuzz:4,scoreNote:"舐めることで不安を和らげ、早食い防止にもなる一石二鳥アイテム。TikTokいいね約42.2K・保存約16.9Kでバズ4"},
+{id:79,name:"PillPaws 毛・肉球を封入する記念キープセイク・キーホルダー（カプセル型）",axis:"A",target:"both",priceBand:"",emotion:"感動/他にない",sourcing:"中",evidence:"TikTok PillPaws（@bellacutelover）の投稿で確認（いいね約440.1K・保存約67.0K）。毛や肉球の形をカプセル型キーホルダーに封入する記念キープセイク",sourceLabel:"TikTok @bellacutelover",sourceUrl:"https://www.tiktok.com/@bellacutelover/video/7605695129478843661",tiktokUrl:"https://www.tiktok.com/@bellacutelover/video/7605695129478843661",arrangement:"うちの子の毛を持ち歩けるカプセル型の一点ものとして、記念日・メモリアルギフトに訴求",score:17,sEmo:5,sProfit:4,sSource:3,sBuzz:5,scoreNote:"うちの子の毛を封入する記念品で感情5。TikTokいいね約440.1K・保存約67.0Kでバズ5"},
+{id:80,name:"愛犬ブランケット（うちの子の顔・毛並みを再現した写真ブランケット）",axis:"A",target:"dog",priceBand:"",emotion:"感動/他にない",sourcing:"中（オーダー制作）",evidence:"TikTok こじろう（@kojipon86）の投稿で確認（いいね約20.4K・保存約3,367）。うちの子の顔と毛並みを再現した写真ブランケット",sourceLabel:"TikTok @kojipon86",sourceUrl:"https://www.tiktok.com/@kojipon86/video/7656417752852303125",tiktokUrl:"https://www.tiktok.com/@kojipon86/video/7656417752852303125",arrangement:"うちの子そっくりのブランケットとして、記念日ギフトやおうち時間の癒しに訴求",score:14,sEmo:5,sProfit:3,sSource:3,sBuzz:3,scoreNote:"うちの子の顔を再現する一点もので感情5。オーダー制作のため仕入れ3、TikTokいいね約20.4Kでバズ3"},
+{id:81,name:"タトゥー風ペットウェア（タトゥー柄プリントの犬服）",axis:"B",target:"dog",priceBand:"",emotion:"おしゃれ/他にない",sourcing:"中",evidence:"TikTok SMART EC01（@amaprhbrkdk）の投稿で確認（いいね約24.6K・保存約2,212）。タトゥー柄をプリントした個性的な犬服",sourceLabel:"TikTok @amaprhbrkdk",sourceUrl:"https://www.tiktok.com/@amaprhbrkdk/video/7636438402178600210",tiktokUrl:"https://www.tiktok.com/@amaprhbrkdk/video/7636438402178600210",arrangement:"タトゥー風の個性的なデザインで、お散歩や撮影で目立つコーデとして訴求",score:13,sEmo:4,sProfit:3,sSource:3,sBuzz:3,scoreNote:"タトゥー柄という個性的なデザインで他にない存在感。TikTokいいね約24.6Kでバズ3"},
+{id:82,name:"車用リード／犬用安全ベルト（シートベルト接続式）",axis:"B",target:"dog",priceBand:"",emotion:"便利/すごい",sourcing:"高",evidence:"TikTok ナナコ（@qa02094）の投稿で確認（いいね約5,021・保存約974）。シートベルトに接続する車用リード／犬用安全ベルト",sourceLabel:"TikTok @qa02094",sourceUrl:"https://www.tiktok.com/@qa02094/video/7683740749422152981",tiktokUrl:"https://www.tiktok.com/@qa02094/video/7683740749422152981",arrangement:"ドライブ時の飛び出し防止と安全対策として、車移動が多い飼い主に訴求",score:14,sEmo:4,sProfit:3,sSource:4,sBuzz:3,scoreNote:"シートベルト接続式で車内での安全を守る実用品で仕入れ4。TikTokいいね約5,021でバズ3"},
+{id:83,name:"猫専用「自動モグラ叩きおもちゃ」（羽根がランダムに飛び出す自動おもちゃ）",axis:"B",target:"cat",priceBand:"",emotion:"かわいい/すごい",sourcing:"中",evidence:"TikTok Mococo（@mococo789）の投稿で確認（いいね約2,994・保存約543）。羽根がランダムに飛び出す猫専用の自動モグラ叩きおもちゃ",sourceLabel:"TikTok @mococo789",sourceUrl:"https://www.tiktok.com/@mococo789/video/7681630681344134418",tiktokUrl:"https://www.tiktok.com/@mococo789/video/7681630681344134418",arrangement:"ランダムに動く羽根で狩猟本能を刺激し、留守番中のひとり遊びとして訴求",score:12,sEmo:4,sProfit:3,sSource:3,sBuzz:2,scoreNote:"羽根がランダムに飛び出す仕掛けで猫の本能を刺激。TikTokいいね約2,994でバズ2"},
+{id:84,name:"窓用吸盤式猫ハンモック（耐荷重15kg）",axis:"B",target:"cat",priceBand:"",emotion:"かわいい/便利",sourcing:"高",evidence:"TikTok 肉包は猫です（@66xp44）で確認（いいね約676・保存約105）",sourceLabel:"TikTok @66xp44",sourceUrl:"https://www.tiktok.com/@66xp44/video/7634464908087774472",tiktokUrl:"https://www.tiktok.com/@66xp44/video/7634464908087774472",arrangement:"窓辺の日向ぼっこスポットとして訴求",score:12,sEmo:4,sProfit:3,sSource:4,sBuzz:1,scoreNote:"吸盤式・耐荷重15kgで仕入れ4、バズ1"}
 ];
 
 /* 商品画像（商品ページのメイン画像を保存したもの）。無い候補は画像なしで表示 */
